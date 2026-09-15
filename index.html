@@ -1,0 +1,1299 @@
+<title>Jejak Hafalan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap">
+<style>
+  :root{
+    --ivory:#F7F3EF;
+    --charcoal:#2C2B2A;
+    --sage:#4A6663;
+    --teal:#9BB5B0;
+    --linen:#C9BEB7;
+
+    --bg:var(--ivory);
+    --surface:#FFFFFF;
+    --surface-2:#FBF8F4;
+    --soft:#EFE7DF;            /* linen-tinted soft panel */
+    --text:var(--charcoal);
+    --text-muted:#6E6A64;
+    --text-faint:#928D86;
+    --border:#E7DFD6;
+    --border-strong:#D8CEC3;
+    --primary:var(--sage);
+    --primary-ink:#FBFDFC;
+    --primary-soft:#E4ECEA;
+    --accent:var(--teal);
+
+    --good:#4A6663;           /* Lancar */
+    --good-soft:#E4ECEA;
+    --warn:#B07D2E;           /* Perlu penguatan */
+    --warn-soft:#F5EBD8;
+    --crit:#B0573C;           /* Perlu diulang */
+    --crit-soft:#F6E4DC;
+    --review:#5E8C86;         /* Sudah dimurajaah */
+    --review-soft:#DDECE9;
+
+    --radius:18px;
+    --radius-sm:12px;
+    --radius-xs:9px;
+    --shadow:0 1px 2px rgba(44,43,42,.04), 0 6px 20px rgba(44,43,42,.06);
+    --shadow-lift:0 8px 30px rgba(44,43,42,.14);
+    --maxw:660px;
+    --font:'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B211F;
+      --surface:#242C29;
+      --surface-2:#202725;
+      --soft:#2C3532;
+      --text:#ECE7E0;
+      --text-muted:#A9B0AB;
+      --text-faint:#828A85;
+      --border:#333D3A;
+      --border-strong:#3E4945;
+      --primary:#8DB1AB;
+      --primary-ink:#16201D;
+      --primary-soft:#2B3A37;
+      --accent:#9BB5B0;
+      --good:#8DB1AB;
+      --good-soft:#2B3A37;
+      --warn:#D6A552;
+      --warn-soft:#3A3222;
+      --crit:#D98A6B;
+      --crit-soft:#3B2A22;
+      --review:#7FB0A8;
+      --review-soft:#26332F;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.32);
+      --shadow-lift:0 8px 30px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B211F;
+    --surface:#242C29;
+    --surface-2:#202725;
+    --soft:#2C3532;
+    --text:#ECE7E0;
+    --text-muted:#A9B0AB;
+    --text-faint:#828A85;
+    --border:#333D3A;
+    --border-strong:#3E4945;
+    --primary:#8DB1AB;
+    --primary-ink:#16201D;
+    --primary-soft:#2B3A37;
+    --accent:#9BB5B0;
+    --good:#8DB1AB;
+    --good-soft:#2B3A37;
+    --warn:#D6A552;
+    --warn-soft:#3A3222;
+    --crit:#D98A6B;
+    --crit-soft:#3B2A22;
+    --review:#7FB0A8;
+    --review-soft:#26332F;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.32);
+    --shadow-lift:0 8px 30px rgba(0,0,0,.45);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  h1,h2,h3{margin:0;font-weight:700;text-wrap:balance;letter-spacing:-.01em}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:15px}
+  .tnum{font-variant-numeric:tabular-nums}
+
+  /* ===== App shell ===== */
+  .app{max-width:var(--maxw);margin:0 auto;padding-inline:16px;padding-bottom:132px}
+  .topbar{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:30;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:saturate(1.2) blur(8px);
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:14px 2px 12px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand .mark{
+    width:34px;height:34px;border-radius:11px;flex:none;
+    background:linear-gradient(150deg,var(--sage),var(--review));
+    display:grid;place-items:center;color:#fff;
+    box-shadow:var(--shadow);
+  }
+  .brand .mark svg{width:19px;height:19px}
+  .brand .name{font-weight:800;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+  .iconbtn{
+    width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text-muted);display:grid;place-items:center;
+  }
+  .iconbtn:hover{color:var(--text);border-color:var(--border-strong)}
+  .iconbtn svg{width:19px;height:19px}
+
+  /* ===== Tabs ===== */
+  .tabs{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:color-mix(in srgb, var(--surface) 96%, transparent);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+    display:flex;justify-content:center;
+  }
+  .tabs .inner{width:100%;max-width:var(--maxw);display:flex;align-items:center;justify-content:space-around;gap:4px}
+  .tab{
+    flex:1;background:none;border:0;color:var(--text-faint);
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:6px 4px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.01em;
+  }
+  .tab svg{width:22px;height:22px}
+  .tab.active{color:var(--primary)}
+  .tab .lab{}
+  .fab{
+    flex:none;width:56px;height:56px;border-radius:18px;border:0;
+    margin-top:-26px;
+    background:linear-gradient(150deg,var(--sage),var(--review));
+    color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-lift);
+    transition:transform .15s ease;
+  }
+  .fab:active{transform:scale(.94)}
+  .fab svg{width:26px;height:26px;transition:transform .2s ease}
+  .fab.open svg{transform:rotate(45deg)}
+
+  /* ===== Cards ===== */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .stack{display:flex;flex-direction:column;gap:14px}
+  .section-title{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:6px 2px 0}
+
+  /* progress metric cards */
+  .metric{padding:18px}
+  .metric .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .metric .eyebrow{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted)}
+  .metric .subtitle{font-size:12.5px;color:var(--text-faint);margin-top:2px}
+  .metric .pill{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .pill.total{background:var(--primary-soft);color:var(--primary)}
+  .pill.target{background:var(--warn-soft);color:var(--warn)}
+  .pill.cycle{background:var(--review-soft);color:var(--review)}
+  .metric .big{display:flex;align-items:baseline;gap:8px}
+  .metric .big .pct{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em}
+  .metric .big .unit{font-size:16px;font-weight:700;color:var(--text-muted)}
+  .metric .ct{font-size:13.5px;color:var(--text-muted);margin-top:8px}
+  .metric .ct b{color:var(--text);font-weight:700}
+  .metric .meta{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12.5px;color:var(--text-faint)}
+
+  .bar{height:10px;border-radius:999px;background:var(--soft);overflow:hidden;margin-top:14px}
+  .bar > span{display:block;height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .bar.total > span{background:linear-gradient(90deg,var(--sage),var(--review))}
+  .bar.target > span{background:linear-gradient(90deg,var(--warn),#CBA05A)}
+  .bar.cycle > span{background:linear-gradient(90deg,var(--review),var(--teal))}
+
+  .empty-note{font-size:13.5px;color:var(--text-muted);margin-top:6px}
+  .linkbtn{background:none;border:0;color:var(--primary);font-weight:700;font-size:13.5px;padding:0;text-decoration:underline;text-underline-offset:3px}
+
+  /* quick actions */
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .qbtn{
+    display:flex;align-items:center;gap:11px;padding:15px;border-radius:var(--radius-sm);
+    border:1px solid var(--border);background:var(--surface);color:var(--text);text-align:left;box-shadow:var(--shadow);
+  }
+  .qbtn:hover{border-color:var(--border-strong)}
+  .qbtn .ic{width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center}
+  .qbtn.hafalan .ic{background:var(--primary-soft);color:var(--primary)}
+  .qbtn.murajaah .ic{background:var(--review-soft);color:var(--review)}
+  .qbtn .ic svg{width:21px;height:21px}
+  .qbtn .t{font-weight:700;font-size:14.5px}
+  .qbtn .s{font-size:12px;color:var(--text-faint)}
+
+  /* focus list */
+  .focus{padding:16px 18px}
+  .focus h3{font-size:16px;margin-bottom:3px}
+  .focus .lead{font-size:13px;color:var(--text-faint);margin-bottom:14px}
+  .focus-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--border)}
+  .focus-row:first-of-type{border-top:0}
+  .focus-row .ic{width:36px;height:36px;border-radius:11px;flex:none;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .focus-row .body{flex:1;min-width:0}
+  .focus-row .body .l{font-size:13.5px;font-weight:600}
+  .focus-row .body .d{font-size:12.5px;color:var(--text-faint);margin-top:1px}
+  .focus-row .v{font-weight:800;font-size:15px;white-space:nowrap}
+  .ic.good{background:var(--primary-soft);color:var(--primary)}
+  .ic.cycle{background:var(--review-soft);color:var(--review)}
+  .ic.crit{background:var(--crit-soft);color:var(--crit)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:12px;font-weight:600;padding:4px 9px;border-radius:8px;background:var(--soft);color:var(--text-muted)}
+  .chip.crit{background:var(--crit-soft);color:var(--crit)}
+  .chip.cycle{background:var(--review-soft);color:var(--review)}
+
+  /* onboarding */
+  .onboard{padding:20px;background:linear-gradient(160deg,var(--primary-soft),var(--surface));border:1px solid var(--border)}
+  .onboard h2{font-size:19px;margin-bottom:6px}
+  .onboard p{margin:0 0 14px;font-size:13.5px;color:var(--text-muted);max-width:52ch}
+  .steps{display:flex;flex-direction:column;gap:9px}
+  .step{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 13px;width:100%;text-align:left;color:var(--text)}
+  .step:hover{border-color:var(--border-strong)}
+  .step .n{width:28px;height:28px;border-radius:9px;flex:none;background:var(--primary);color:var(--primary-ink);display:grid;place-items:center;font-weight:800;font-size:14px}
+  .step .tx b{display:block;font-size:14px;font-weight:700}
+  .step .tx span{font-size:12px;color:var(--text-faint)}
+  .step .go{margin-left:auto;color:var(--text-faint)}
+  .dismiss{margin-top:14px;display:flex;justify-content:flex-end}
+
+  /* ===== Peta / juz ===== */
+  .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .fchip{
+    flex:none;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;
+    border:1px solid var(--border);background:var(--surface);color:var(--text-muted);white-space:nowrap;
+  }
+  .fchip.active{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+
+  .juz-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:520px){.juz-grid{grid-template-columns:1fr 1fr}}
+  .juz-card{display:flex;align-items:center;gap:14px;padding:14px;text-align:left;width:100%;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);color:var(--text);box-shadow:var(--shadow)}
+  .juz-card:hover{border-color:var(--border-strong)}
+  .juz-ring{position:relative;width:50px;height:50px;flex:none}
+  .juz-ring svg{transform:rotate(-90deg);display:block}
+  .juz-ring .lbl{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:800}
+  .juz-card .info{flex:1;min-width:0}
+  .juz-card .info .tt{font-weight:700;font-size:14.5px}
+  .juz-card .info .rg{font-size:12px;color:var(--text-faint);margin-top:1px}
+  .juz-card .info .pg{font-size:12.5px;color:var(--text-muted);margin-top:6px}
+  .juz-card .pctnum{font-weight:800;font-size:14px;color:var(--primary)}
+
+  /* page grid inside juz */
+  .page-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+  .pg-cell{
+    position:relative;aspect-ratio:1;border-radius:11px;border:1.5px solid var(--border);
+    background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;color:var(--text);font-weight:700;font-size:14px;
+  }
+  .pg-cell .st{font-size:13px;line-height:1}
+  .pg-cell.parsial{border-color:var(--warn);background:var(--warn-soft)}
+  .pg-cell.penuh{border-color:var(--good);background:var(--good-soft)}
+  .pg-cell.diulang{border-color:var(--crit);background:var(--crit-soft)}
+  .pg-cell .corner{position:absolute;top:3px;right:4px;font-size:10px;font-weight:800;line-height:1}
+  .pg-cell .corner.rev{color:var(--review)}
+  .pg-cell .num{font-size:13px}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12px;color:var(--text-muted);margin-top:4px}
+  .legend .li{display:flex;align-items:center;gap:6px}
+  .legend .sw{width:15px;height:15px;border-radius:5px;border:1.5px solid var(--border);display:grid;place-items:center;font-size:10px}
+  .sw.parsial{border-color:var(--warn);background:var(--warn-soft)}
+  .sw.penuh{border-color:var(--good);background:var(--good-soft)}
+  .sw.diulang{border-color:var(--crit);background:var(--crit-soft)}
+  .sw.rev{border-color:var(--review);color:var(--review)}
+
+  /* ===== history ===== */
+  .hist-day{margin-top:6px}
+  .hist-date{font-size:12.5px;font-weight:700;color:var(--text-muted);margin:14px 2px 8px;text-transform:capitalize}
+  .hrow{display:flex;gap:12px;padding:13px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);margin-bottom:8px;box-shadow:var(--shadow)}
+  .hrow .tag{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center}
+  .hrow .tag svg{width:19px;height:19px}
+  .hrow.h .tag{background:var(--primary-soft);color:var(--primary)}
+  .hrow.m .tag{background:var(--review-soft);color:var(--review)}
+  .hrow .body{flex:1;min-width:0}
+  .hrow .l1{font-weight:700;font-size:14px}
+  .hrow .l2{font-size:12.5px;color:var(--text-faint);margin-top:2px}
+  .hrow .l2 .q{font-weight:700}
+  .hrow .note{font-size:12.5px;color:var(--text-muted);margin-top:5px;font-style:italic}
+  .hrow .acts{display:flex;flex-direction:column;gap:4px}
+  .hrow .acts button{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text-faint);display:grid;place-items:center}
+  .hrow .acts button:hover{color:var(--text);border-color:var(--border-strong)}
+  .hrow .acts svg{width:15px;height:15px}
+  .qdot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:5px}
+  .qdot.lancar{background:var(--good)}
+  .qdot.penguatan{background:var(--warn)}
+  .qdot.diulang{background:var(--crit)}
+  .initbadge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--text-muted);margin-left:6px}
+
+  /* ===== modal ===== */
+  .overlay{position:fixed;inset:0;z-index:60;background:rgba(28,30,29,.42);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;padding:0}
+  @media(min-width:560px){.overlay{align-items:center;padding:20px}}
+  .sheet{
+    background:var(--surface);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;
+    border-radius:22px 22px 0 0;box-shadow:var(--shadow-lift);
+    padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));
+    animation:rise .28s cubic-bezier(.2,.75,.2,1);
+  }
+  @media(min-width:560px){.sheet{border-radius:22px}}
+  @keyframes rise{from{transform:translateY(24px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  @media(prefers-reduced-motion:reduce){.sheet{animation:none}.bar>span{transition:none}}
+  .sheet .sh-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+  .sheet h2{font-size:19px}
+  .sheet .sh-sub{font-size:12.5px;color:var(--text-faint);margin-top:2px}
+  .closeb{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);display:grid;place-items:center;flex:none}
+  .closeb svg{width:18px;height:18px}
+
+  .field{margin-bottom:15px}
+  .field > label{display:block;font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px}
+  .field .hint{font-size:11.5px;color:var(--text-faint);margin-top:6px;font-weight:400}
+  input[type=text],input[type=number],input[type=date],textarea,select{
+    width:100%;padding:11px 12px;border-radius:var(--radius-xs);border:1px solid var(--border-strong);
+    background:var(--surface-2);color:var(--text);outline:none;
+  }
+  input:focus,textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  textarea{resize:vertical;min-height:64px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .seg{display:flex;gap:6px;background:var(--soft);padding:4px;border-radius:12px}
+  .seg button{flex:1;border:0;background:none;padding:9px 6px;border-radius:9px;font-weight:700;font-size:12.5px;color:var(--text-muted)}
+  .seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+  .seg.q button.on[data-q=lancar]{color:var(--good)}
+  .seg.q button.on[data-q=penguatan]{color:var(--warn)}
+  .seg.q button.on[data-q=diulang]{color:var(--crit)}
+
+  .qtr{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .qtr button{flex:1;min-width:64px;border:1px solid var(--border-strong);background:var(--surface-2);border-radius:10px;padding:9px 4px;font-weight:700;font-size:12.5px;color:var(--text-muted)}
+  .qtr button.on{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+  .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}
+  .qgrid button{border:1px solid var(--border-strong);background:var(--surface-2);border-radius:9px;padding:10px 2px;font-size:11.5px;font-weight:600;color:var(--text-muted)}
+  .qgrid button.on{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+
+  .toggle{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2)}
+  .toggle .sw2{width:44px;height:26px;border-radius:999px;background:var(--border-strong);position:relative;flex:none;transition:background .2s}
+  .toggle .sw2::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .toggle.on .sw2{background:var(--primary)}
+  .toggle.on .sw2::after{transform:translateX(18px)}
+  .toggle .tx b{font-size:13.5px;display:block}
+  .toggle .tx span{font-size:11.5px;color:var(--text-faint)}
+
+  .juz-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:7px;max-height:180px;overflow-y:auto;padding:3px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)}
+  .juz-picker button{border:1px solid var(--border-strong);background:var(--surface);border-radius:9px;padding:9px 2px;font-size:12px;font-weight:700;color:var(--text-muted)}
+  .juz-picker button.on{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+  .juz-picker button:disabled{opacity:.35;cursor:not-allowed}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:13px;border:0;font-weight:700;font-size:14.5px}
+  .btn.primary{background:var(--primary);color:var(--primary-ink);width:100%}
+  .btn.primary:active{transform:translateY(1px)}
+  .btn.ghost{background:var(--soft);color:var(--text)}
+  .btn.danger{background:var(--crit-soft);color:var(--crit)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-row{display:flex;gap:10px;margin-top:6px}
+
+  .info-line{font-size:12.5px;color:var(--text-muted);background:var(--soft);border-radius:10px;padding:11px 12px;margin-bottom:14px;line-height:1.55}
+  .kv{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:8px 0;border-top:1px solid var(--border)}
+  .kv:first-child{border-top:0}
+  .kv .k{color:var(--text-muted)}
+  .kv .v{font-weight:700}
+
+  .settings-group{padding:6px 4px}
+  .set-item{display:flex;align-items:center;gap:13px;padding:15px 4px;border-bottom:1px solid var(--border);width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0;color:var(--text)}
+  .set-item:last-child{border-bottom:0}
+  .set-item .ic{width:38px;height:38px;border-radius:11px;flex:none;background:var(--soft);display:grid;place-items:center;color:var(--text-muted)}
+  .set-item .ic svg{width:19px;height:19px}
+  .set-item .tx{flex:1}
+  .set-item .tx b{display:block;font-size:14px;font-weight:700}
+  .set-item .tx span{font-size:12px;color:var(--text-faint)}
+  .set-item .go{color:var(--text-faint)}
+
+  .empty-state{text-align:center;padding:48px 20px;color:var(--text-faint)}
+  .empty-state svg{width:44px;height:44px;opacity:.5;margin-bottom:12px}
+  .empty-state p{font-size:14px;margin:0}
+
+  .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+    background:var(--charcoal);color:#F7F3EF;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow-lift);z-index:80;opacity:0;transition:opacity .25s, transform .25s;pointer-events:none;white-space:nowrap}
+  :root[data-theme=dark] .toast{background:#0F1413}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+  .fab-menu{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:41;display:flex;flex-direction:column;gap:9px;align-items:center}
+  .fab-menu button{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-lift);border-radius:14px;padding:12px 18px;font-weight:700;font-size:14px;color:var(--text);animation:rise .2s ease}
+  .fab-menu button .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center}
+  .fab-menu .hafalan .ic{background:var(--primary-soft);color:var(--primary)}
+  .fab-menu .murajaah .ic{background:var(--review-soft);color:var(--review)}
+  .scrim{position:fixed;inset:0;z-index:39;background:rgba(28,30,29,.28)}
+
+  .mini-bar{height:7px;border-radius:999px;background:var(--soft);overflow:hidden;margin-top:7px}
+  .mini-bar>span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--warn),#CBA05A)}
+  .page-hist{font-size:12.5px;color:var(--text-muted)}
+  .page-hist .ph{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--border)}
+</style>
+
+<div class="app" id="app"></div>
+<nav class="tabs">
+  <div class="inner">
+    <button class="tab" data-nav="beranda">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+      <span class="lab">Beranda</span>
+    </button>
+    <button class="tab" data-nav="peta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+      <span class="lab">Peta</span>
+    </button>
+    <button class="fab" id="fab" aria-label="Catat cepat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="tab" data-nav="peta2" style="visibility:hidden;pointer-events:none"><span class="lab">.</span></button>
+    <button class="tab" data-nav="riwayat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg>
+      <span class="lab">Riwayat</span>
+    </button>
+  </div>
+</nav>
+<div id="modal-root"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Jejak Hafalan — pelacak hafalan & murajaah Al-Qur'an
+   Mushaf Madinah 604 halaman
+   ============================================================ */
+
+/* ---------- Pemetaan halaman per juz ---------- */
+function juzRange(j){
+  if(j===1) return [1,21];
+  if(j===30) return [582,604];
+  return [(j-1)*20+2, j*20+1];
+}
+function juzPageCount(j){ return j===1?21:(j===30?23:20); }
+function juzPages(j){ const [a,b]=juzRange(j); const r=[]; for(let p=a;p<=b;p++) r.push(p); return r; }
+function pageToJuz(p){
+  if(p<=21) return 1;
+  if(p>=582) return 30;
+  return Math.floor((p-22)/20)+2;
+}
+const TOTAL_PAGES=604;
+
+/* ---------- State ---------- */
+const KEY='jejak_hafalan_v1';
+let state = {
+  version:1,
+  hafalan:[],   // {id,date,createdAt,initial,quality,note,items:[{page,quarters:[1..4]}]}
+  murajaah:[],  // {id,date,createdAt,quality,note,pages:[..]}
+  target:null,  // {mode:'harian'|'mingguan', pages:Number}
+  cycles:[],    // {id,name,start,end,targetPages:[..],createdAt}
+  activeCycleId:null,
+  onboardingDismissed:false
+};
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function load(){
+  try{ const s=localStorage.getItem(KEY); if(s){ const p=JSON.parse(s); state=Object.assign(state,p); } }catch(e){}
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ---------- Tanggal ---------- */
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtDate(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function todayStr(){ return fmtDate(new Date()); }
+function parseD(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+function longDate(s){ const d=parseD(s); return HARI[d.getDay()]+', '+d.getDate()+' '+BULAN[d.getMonth()]+' '+d.getFullYear(); }
+function shortDate(s){ const d=parseD(s); return d.getDate()+' '+BULAN[d.getMonth()].slice(0,3)+' '+d.getFullYear(); }
+function todayLabel(s){ if(s===todayStr()) return 'Hari ini'; const y=new Date(); y.setDate(y.getDate()-1); if(s===fmtDate(y)) return 'Kemarin'; return longDate(s); }
+
+/* ---------- Angka ---------- */
+function fmtNum(n,dec){ if(dec===undefined)dec=2; return Number(n).toLocaleString('id-ID',{maximumFractionDigits:dec}); }
+function fmtPct(n){ return Number(n).toLocaleString('id-ID',{maximumFractionDigits:1}); }
+
+/* ---------- Periode target aktif ---------- */
+function activePeriod(){
+  if(!state.target) return null;
+  const t=new Date(); t.setHours(0,0,0,0);
+  if(state.target.mode==='harian'){
+    const s=fmtDate(t);
+    return {start:s,end:s,label:'Hari ini'};
+  }
+  const day=t.getDay(); const off=(day+6)%7; // Senin sebagai awal pekan
+  const ws=new Date(t); ws.setDate(t.getDate()-off);
+  const we=new Date(ws); we.setDate(ws.getDate()+6);
+  return {start:fmtDate(ws),end:fmtDate(we),label:'Minggu ini',range:shortDate(fmtDate(ws))+' – '+shortDate(fmtDate(we))};
+}
+function activeCycle(){ return state.cycles.find(c=>c.id===state.activeCycleId)||null; }
+
+/* ---------- Turunan / perhitungan ---------- */
+function derive(){
+  const D={pages:{},juz:{},qFirst:{}};
+  // urutkan hafalan menaik untuk menentukan kemunculan pertama tiap seperempat
+  const sortedH=[...state.hafalan].sort((a,b)=> a.date<b.date?-1:a.date>b.date?1:(a.createdAt-b.createdAt));
+  const qFirst={}; // 'page-q' -> {date, initial}
+  for(const e of sortedH){
+    for(const it of e.items){
+      for(const q of it.quarters){
+        const k=it.page+'-'+q;
+        if(!(k in qFirst)) qFirst[k]={date:e.date, initial:!!e.initial};
+      }
+    }
+  }
+  D.qFirst=qFirst;
+  // seperempat yang dihafal per halaman
+  const pageQ={};
+  for(const k in qFirst){ const i=k.indexOf('-'); const p=+k.slice(0,i); const q=+k.slice(i+1); (pageQ[p]=pageQ[p]||new Set()).add(q); }
+
+  // kualitas terakhir per halaman + murajaah terakhir + riwayat
+  const qEvent={};
+  function consider(page,date,createdAt,quality){
+    if(!quality) return;
+    const c=qEvent[page];
+    if(!c || date>c.date || (date===c.date && createdAt>c.createdAt)) qEvent[page]={date,createdAt,quality};
+  }
+  for(const e of state.hafalan){ if(e.quality) for(const it of e.items) consider(it.page,e.date,e.createdAt,e.quality); }
+  const lastMur={};
+  for(const e of state.murajaah){
+    for(const p of e.pages){
+      if(e.quality) consider(p,e.date,e.createdAt,e.quality);
+      if(!lastMur[p]||e.date>lastMur[p]) lastMur[p]=e.date;
+    }
+  }
+  // dimurajaah dalam siklus aktif
+  const cyc=activeCycle();
+  const revActive={};
+  if(cyc){
+    for(const e of state.murajaah){
+      if(e.date>=cyc.start && e.date<=cyc.end){ for(const p of e.pages) revActive[p]=true; }
+    }
+  }
+  // data per halaman
+  let totalMem=0;
+  for(const p in pageQ){
+    const set=pageQ[p]; const frac=set.size/4;
+    totalMem+=frac;
+    D.pages[p]={quarters:set, mem:set.size, frac,
+      quality:qEvent[p]?qEvent[p].quality:null,
+      lastMurajaah:lastMur[p]||null,
+      reviewedActive:!!revActive[p]};
+  }
+  D.totalMem=totalMem;
+  D.totalPct=totalMem/TOTAL_PAGES*100;
+
+  // per juz
+  for(let j=1;j<=30;j++){
+    const [a,b]=juzRange(j); let mem=0;
+    for(let p=a;p<=b;p++){ if(D.pages[p]) mem+=D.pages[p].frac; }
+    D.juz[j]={memPages:mem, pct:mem/juzPageCount(j)*100, count:juzPageCount(j)};
+  }
+
+  // target hafalan baru
+  const period=activePeriod();
+  D.period=period;
+  if(period && state.target && state.target.pages>0){
+    let newQ=0;
+    for(const k in qFirst){ const f=qFirst[k]; if(!f.initial && f.date>=period.start && f.date<=period.end) newQ++; }
+    const newPages=newQ/4;
+    D.target={newPages, pct:newPages/state.target.pages*100, remaining:Math.max(0,state.target.pages-newPages), goal:state.target.pages};
+  } else {
+    D.target=null;
+  }
+
+  // siklus murajaah
+  if(cyc && cyc.targetPages.length){
+    let reviewed=0; const remaining=[];
+    for(const p of cyc.targetPages){ if(revActive[p]) reviewed++; else remaining.push(p); }
+    D.cycle={cyc, reviewed, total:cyc.targetPages.length, pct:reviewed/cyc.targetPages.length*100, remaining};
+  } else {
+    D.cycle={cyc, reviewed:0, total:cyc?cyc.targetPages.length:0, pct:0, remaining:cyc?[...cyc.targetPages]:[]};
+  }
+
+  // halaman perlu diulang
+  D.needReview=Object.keys(D.pages).filter(p=>D.pages[p].quality==='diulang').map(Number).sort((a,b)=>a-b);
+  return D;
+}
+
+/* ---------- Util UI ---------- */
+const QLABEL={lancar:'Lancar',penguatan:'Perlu penguatan',diulang:'Perlu diulang'};
+function qMark(q){ return q==='lancar'?'✓':q==='penguatan'?'~':'!'; }
+function pageStatus(pd){
+  if(!pd||pd.mem===0) return {cls:'belum',mark:'○',label:'Belum dihafal'};
+  if(pd.quality==='diulang') return {cls:'diulang',mark:'!',label:'Perlu diulang'};
+  if(pd.mem<4) return {cls:'parsial',mark:'◑',label:'Dihafal sebagian'};
+  return {cls:'penuh',mark:'●',label:'Sudah dihafal'};
+}
+function ring(pct,size,stroke){
+  size=size||50; stroke=stroke||5;
+  const r=(size-stroke)/2; const c=2*Math.PI*r; const off=c*(1-Math.min(100,pct)/100);
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'
+   +'<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="var(--soft)" stroke-width="'+stroke+'"/>'
+   +'<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="var(--primary)" stroke-width="'+stroke+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/>'
+   +'</svg>';
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- Router ---------- */
+let view='beranda';
+let petaFilter=null; // 'diulang' | 'belum-murajaah' | 'sudah' | 'sebagian'
+function nav(v){ view=v; render(); document.getElementById('app').scrollIntoView({block:'start'}); window.scrollTo(0,0); }
+
+/* ---------- Render utama ---------- */
+function render(){
+  const D=derive();
+  document.querySelectorAll('.tab[data-nav]').forEach(b=>b.classList.toggle('active', b.dataset.nav===view));
+  const app=document.getElementById('app');
+  let html='<header class="topbar"><div class="brand">'
+    +'<div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-2 2.2-5 3-8 3v7c0 4 3.5 6.4 8 8 4.5-1.6 8-4 8-8V6c-3 0-6-.8-8-3Z"/><path d="M9.2 11.8 11.2 14l3.8-4"/></svg></div>'
+    +'<div class="name">Jejak Hafalan</div></div>'
+    +'<button class="iconbtn" data-open="settings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V1a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 17 4.6a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H23a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/></svg></button>'
+    +'</header>';
+
+  if(view==='beranda') html+=renderBeranda(D);
+  else if(view==='peta') html+=renderPeta(D);
+  else if(view==='riwayat') html+=renderRiwayat(D);
+  app.innerHTML=html;
+}
+
+/* ---------- Beranda ---------- */
+function renderBeranda(D){
+  let h='<div class="stack">';
+  const empty=state.hafalan.length===0;
+  if(empty && !state.onboardingDismissed){
+    h+='<div class="card onboard">'
+      +'<h2>Assalamu\'alaikum 🌙</h2>'
+      +'<p>Selamat datang. Aplikasi ini membantumu melihat berapa persen total hafalanmu, pencapaian target hafalan baru, dan progres murajaah — semuanya per halaman Mushaf Madinah (604 halaman).</p>'
+      +'<div class="steps">'
+      +'<button class="step" data-open="hafalan-awal"><span class="n">1</span><span class="tx"><b>Tandai hafalan awal</b><span>Catat halaman/juz yang sudah kamu hafal</span></span><span class="go">›</span></button>'
+      +'<button class="step" data-open="target"><span class="n">2</span><span class="tx"><b>Atur target hafalan baru</b><span>Harian atau mingguan, sesuai ritmemu</span></span><span class="go">›</span></button>'
+      +'<button class="step" data-open="cycle"><span class="n">3</span><span class="tx"><b>Buat siklus murajaah</b><span>Pilih bagian yang ingin diulang</span></span><span class="go">›</span></button>'
+      +'</div>'
+      +'<div class="dismiss"><button class="linkbtn" data-act="dismiss-onboard">Nanti saja, mulai dari kosong</button></div>'
+      +'</div>';
+  }
+
+  // Kartu A — Total Hafalan
+  h+='<div class="card metric">'
+    +'<div class="head"><div><div class="eyebrow">Total Hafalan</div><div class="subtitle">Dari keseluruhan mushaf</div></div><span class="pill total">604 halaman</span></div>'
+    +'<div class="big"><span class="pct tnum">'+fmtPct(D.totalPct)+'</span><span class="unit">%</span></div>'
+    +'<div class="ct">Sudah dihafal: <b class="tnum">'+fmtNum(D.totalMem)+'</b> dari 604 halaman</div>'
+    +'<div class="bar total"><span style="width:'+Math.min(100,D.totalPct)+'%"></span></div>'
+    +'</div>';
+
+  // Kartu B — Target Hafalan Baru
+  h+='<div class="card metric">'
+    +'<div class="head"><div><div class="eyebrow">Target Hafalan Baru</div>'
+    +'<div class="subtitle">'+(state.target?(state.target.mode==='mingguan'?'Target minggu ini':'Target hari ini'):'Belum ada target')+'</div></div>'
+    +'<span class="pill target">'+(D.period?D.period.label:'—')+'</span></div>';
+  if(!state.target){
+    h+='<div class="big"><span class="pct" style="font-size:24px;color:var(--text-muted)">Atur target</span></div>'
+      +'<div class="empty-note">Tentukan berapa halaman baru yang ingin kamu capai. Bisa kamu ubah kapan pun.</div>'
+      +'<div style="margin-top:12px"><button class="btn ghost" data-open="target">Atur target hafalan baru</button></div>';
+  } else {
+    const t=D.target;
+    h+='<div class="big"><span class="pct tnum">'+fmtPct(t.pct)+'</span><span class="unit">%</span></div>'
+      +'<div class="ct">Tercapai: <b class="tnum">'+fmtNum(t.newPages)+'</b> dari '+fmtNum(t.goal)+' halaman</div>'
+      +'<div class="bar target"><span style="width:'+Math.min(100,t.pct)+'%"></span></div>'
+      +'<div class="meta"><span>Sisa target: <b class="tnum" style="color:var(--text)">'+fmtNum(t.remaining)+'</b> halaman</span>'
+      +(state.target.mode==='mingguan'&&D.period.range?'<span>'+D.period.range+'</span>':'')+'</div>';
+  }
+  h+='</div>';
+
+  // Kartu C — Murajaah Siklus Aktif
+  const c=D.cycle;
+  h+='<div class="card metric">'
+    +'<div class="head"><div><div class="eyebrow">Murajaah Siklus Aktif</div>'
+    +'<div class="subtitle">'+(c.cyc?esc(c.cyc.name):'Belum ada siklus')+'</div></div>'
+    +'<span class="pill cycle">'+(c.cyc?'Aktif':'—')+'</span></div>';
+  if(!c.cyc || c.total===0){
+    h+='<div class="big"><span class="pct" style="font-size:24px;color:var(--text-muted)">Atur target</span></div>'
+      +'<div class="empty-note">Buat siklus murajaah: pilih bagian hafalan yang ingin diulang beserta rentang tanggalnya.</div>'
+      +'<div style="margin-top:12px"><button class="btn ghost" data-open="cycle">Buat siklus murajaah</button></div>';
+  } else {
+    h+='<div class="big"><span class="pct tnum">'+fmtPct(c.pct)+'</span><span class="unit">%</span></div>'
+      +'<div class="ct">Sudah diulang: <b class="tnum">'+c.reviewed+'</b> dari '+c.total+' halaman</div>'
+      +'<div class="bar cycle"><span style="width:'+Math.min(100,c.pct)+'%"></span></div>'
+      +'<div class="meta"><span>Sisa: <b class="tnum" style="color:var(--text)">'+c.remaining.length+'</b> halaman</span>'
+      +'<span>'+shortDate(c.cyc.start)+' – '+shortDate(c.cyc.end)+'</span></div>';
+  }
+  h+='</div>';
+
+  // Aksi cepat
+  h+='<div class="quick">'
+    +'<button class="qbtn hafalan" data-open="hafalan"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><span><span class="t">Tambah Hafalan</span><span class="s">Catat hafalan baru</span></span></button>'
+    +'<button class="qbtn murajaah" data-open="murajaah"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg></span><span><span class="t">Catat Murajaah</span><span class="s">Tandai halaman yang diulang</span></span></button>'
+    +'</div>';
+
+  // Fokus hari ini
+  h+=renderFokus(D);
+
+  h+='</div>';
+  return h;
+}
+
+function renderFokus(D){
+  let h='<div class="card focus"><h3>Fokus Hari Ini</h3><div class="lead">Langkah-langkah kecil yang menenangkan, satu per satu.</div>';
+  // target
+  if(state.target){
+    const t=D.target;
+    h+='<div class="focus-row"><span class="ic good">✓</span><div class="body"><div class="l">'
+      +(state.target.mode==='mingguan'?'Target minggu ini':'Target hari ini')+'</div>'
+      +'<div class="d">'+fmtNum(t.newPages)+' dari '+fmtNum(t.goal)+' halaman baru'+(t.remaining>0?' · sisa '+fmtNum(t.remaining):' · sudah tercapai, alhamdulillah')+'</div></div>'
+      +'<span class="v tnum">'+fmtPct(t.pct)+'%</span></div>';
+  } else {
+    h+='<div class="focus-row"><span class="ic good">✓</span><div class="body"><div class="l">Target hafalan baru</div><div class="d">Belum diatur — tetapkan kapan pun kamu siap.</div></div><button class="linkbtn" data-open="target">Atur</button></div>';
+  }
+  // belum dimurajaah siklus aktif
+  if(D.cycle.cyc && D.cycle.total>0){
+    const rem=D.cycle.remaining;
+    h+='<div class="focus-row"><span class="ic cycle">↻</span><div class="body"><div class="l">Belum dimurajaah pada siklus aktif</div>'
+      +'<div class="d">'+(rem.length===0?'Semua halaman siklus sudah diulang 🌿':rem.length+' halaman menunggu diulang')+'</div>'
+      +(rem.length?'<div class="chips">'+rem.slice(0,8).map(p=>'<span class="chip cycle">hlm '+p+'</span>').join('')+(rem.length>8?'<span class="chip cycle">+'+(rem.length-8)+'</span>':'')+'</div>':'')
+      +'</div><span class="v tnum">'+rem.length+'</span></div>';
+  } else {
+    h+='<div class="focus-row"><span class="ic cycle">↻</span><div class="body"><div class="l">Murajaah</div><div class="d">Belum ada siklus aktif.</div></div><button class="linkbtn" data-open="cycle">Buat</button></div>';
+  }
+  // perlu diulang
+  const nr=D.needReview;
+  h+='<div class="focus-row"><span class="ic crit">!</span><div class="body"><div class="l">Halaman perlu diulang</div>'
+    +'<div class="d">'+(nr.length===0?'Tidak ada yang ditandai perlu diulang.':nr.length+' halaman perlu penguatan ulang')+'</div>'
+    +(nr.length?'<div class="chips">'+nr.slice(0,8).map(p=>'<span class="chip crit" data-page="'+p+'">hlm '+p+'</span>').join('')+(nr.length>8?'<span class="chip crit">+'+(nr.length-8)+'</span>':'')+'</div>':'')
+    +'</div><span class="v tnum">'+nr.length+'</span></div>';
+  h+='</div>';
+  return h;
+}
+
+/* ---------- Peta Hafalan ---------- */
+function renderPeta(D){
+  let h='<div class="stack">';
+  h+='<div><div class="section-title">Peta Hafalan</div></div>';
+  const filters=[['diulang','Perlu diulang'],['belum-murajaah','Belum dimurajaah'],['sudah','Sudah dihafal'],['sebagian','Dihafal sebagian']];
+  h+='<div class="filters">';
+  h+='<button class="fchip'+(petaFilter===null?' active':'')+'" data-filter="__none">Semua juz</button>';
+  for(const [k,l] of filters) h+='<button class="fchip'+(petaFilter===k?' active':'')+'" data-filter="'+k+'">'+l+'</button>';
+  h+='</div>';
+
+  if(petaFilter){
+    // daftar halaman hasil filter
+    const pages=filterPages(D);
+    h+='<div class="card" style="padding:16px">';
+    h+='<div class="section-title" style="margin:0 0 10px">'+pages.length+' halaman · '+(filters.find(f=>f[0]===petaFilter)||[])[1]+'</div>';
+    if(pages.length===0){ h+='<div class="empty-note">Tidak ada halaman yang cocok dengan filter ini.</div>'; }
+    else{
+      h+='<div class="page-grid">';
+      for(const p of pages) h+=pageCell(p,D);
+      h+='</div>'+legendHtml();
+    }
+    h+='</div>';
+  }
+
+  h+='<div class="juz-grid">';
+  for(let j=1;j<=30;j++){
+    const jd=D.juz[j]; const [a,b]=juzRange(j);
+    h+='<button class="juz-card" data-juz="'+j+'">'
+      +'<div class="juz-ring">'+ring(jd.pct,50,5)+'<span class="lbl tnum">'+j+'</span></div>'
+      +'<div class="info"><div class="tt">Juz '+j+'</div>'
+      +'<div class="rg">Halaman '+a+'–'+b+' · '+jd.count+' halaman</div>'
+      +'<div class="pg tnum">'+fmtNum(jd.memPages)+' halaman dihafal</div></div>'
+      +'<div class="pctnum tnum">'+fmtPct(jd.pct)+'%</div>'
+      +'</button>';
+  }
+  h+='</div></div>';
+  return h;
+}
+function filterPages(D){
+  const out=[];
+  for(let p=1;p<=TOTAL_PAGES;p++){
+    const pd=D.pages[p];
+    if(petaFilter==='diulang'){ if(pd&&pd.quality==='diulang') out.push(p); }
+    else if(petaFilter==='sudah'){ if(pd&&pd.mem===4) out.push(p); }
+    else if(petaFilter==='sebagian'){ if(pd&&pd.mem>0&&pd.mem<4) out.push(p); }
+    else if(petaFilter==='belum-murajaah'){ if(pd&&pd.mem>0&&!pd.reviewedActive) out.push(p); }
+  }
+  return out;
+}
+function pageCell(p,D){
+  const pd=D.pages[p]; const st=pageStatus(pd);
+  let corner='';
+  if(pd&&pd.reviewedActive) corner='<span class="corner rev">↻</span>';
+  else if(pd&&pd.quality==='penguatan') corner='<span class="corner" style="color:var(--warn)">~</span>';
+  return '<button class="pg-cell '+st.cls+'" data-page="'+p+'" title="Halaman '+p+' — '+st.label+'">'+corner
+    +'<span class="st">'+st.mark+'</span><span class="num tnum">'+p+'</span></button>';
+}
+function legendHtml(){
+  return '<div class="legend">'
+    +'<span class="li"><span class="sw">○</span>Belum</span>'
+    +'<span class="li"><span class="sw parsial">◑</span>Sebagian</span>'
+    +'<span class="li"><span class="sw penuh">●</span>Sudah</span>'
+    +'<span class="li"><span class="sw diulang">!</span>Perlu diulang</span>'
+    +'<span class="li"><span class="sw rev">↻</span>Dimurajaah (siklus aktif)</span>'
+    +'</div>';
+}
+
+/* ---------- Riwayat ---------- */
+let histFilter='all';
+function renderRiwayat(D){
+  let h='<div class="stack">';
+  h+='<div class="section-title">Riwayat</div>';
+  h+='<div class="seg" style="max-width:100%"><button data-hfilter="all" class="'+(histFilter==='all'?'on':'')+'">Semua</button>'
+    +'<button data-hfilter="hafalan" class="'+(histFilter==='hafalan'?'on':'')+'">Hafalan</button>'
+    +'<button data-hfilter="murajaah" class="'+(histFilter==='murajaah'?'on':'')+'">Murajaah</button></div>';
+
+  let items=[];
+  if(histFilter!=='murajaah') for(const e of state.hafalan) items.push({type:'h',e});
+  if(histFilter!=='hafalan') for(const e of state.murajaah) items.push({type:'m',e});
+  items.sort((x,y)=> x.e.date<y.e.date?1:x.e.date>y.e.date?-1:(y.e.createdAt-x.e.createdAt));
+
+  if(items.length===0){
+    h+='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg><p>Belum ada catatan. Mulai dengan menambah hafalan atau mencatat murajaah.</p></div>';
+    h+='</div>'; return h;
+  }
+  let curDate='';
+  for(const it of items){
+    if(it.e.date!==curDate){ curDate=it.e.date; h+='<div class="hist-date">'+todayLabel(curDate)+'</div>'; }
+    h+=histRow(it);
+  }
+  h+='</div>';
+  return h;
+}
+function pagesSummary(pagesOrItems,isItems){
+  // ringkas daftar halaman jadi rentang
+  let pages=[];
+  if(isItems){ for(const it of pagesOrItems) pages.push(it.page); } else { pages=[...pagesOrItems]; }
+  pages=[...new Set(pages)].sort((a,b)=>a-b);
+  if(pages.length===0) return '—';
+  const ranges=[]; let s=pages[0],prev=pages[0];
+  for(let i=1;i<=pages.length;i++){
+    if(pages[i]===prev+1){ prev=pages[i]; continue; }
+    ranges.push(s===prev?('hlm '+s):('hlm '+s+'–'+prev)); s=pages[i]; prev=pages[i];
+  }
+  return ranges.join(', ');
+}
+function histRow(it){
+  const e=it.e;
+  if(it.type==='h'){
+    const totalPages=e.items.length;
+    const partial=e.items.some(x=>x.quarters.length<4);
+    let sum=pagesSummary(e.items,true);
+    let detail=totalPages+' halaman';
+    if(totalPages===1 && e.items[0].quarters.length<4){ detail=fracLabel(e.items[0].quarters.length)+' halaman'; }
+    const jset=[...new Set(e.items.map(x=>pageToJuz(x.page)))];
+    return '<div class="hrow h"><div class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>'
+      +'<div class="body"><div class="l1">Tambah Hafalan · '+sum+(e.initial?'<span class="initbadge">Hafalan awal</span>':'')+'</div>'
+      +'<div class="l2">Juz '+jset.join(', ')+' · '+detail+(e.quality?' · <span class="qdot '+e.quality+'"></span><span class="q">'+QLABEL[e.quality]+'</span>':'')+'</div>'
+      +(e.note?'<div class="note">"'+esc(e.note)+'"</div>':'')+'</div>'
+      +'<div class="acts"><button data-edit="h:'+e.id+'" aria-label="Ubah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'
+      +'<button data-del="h:'+e.id+'" aria-label="Hapus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div></div>';
+  } else {
+    const sum=pagesSummary(e.pages,false);
+    const jset=[...new Set(e.pages.map(p=>pageToJuz(p)))];
+    return '<div class="hrow m"><div class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg></div>'
+      +'<div class="body"><div class="l1">Catat Murajaah · '+sum+'</div>'
+      +'<div class="l2">Juz '+jset.join(', ')+' · '+e.pages.length+' halaman'+(e.quality?' · <span class="qdot '+e.quality+'"></span><span class="q">'+QLABEL[e.quality]+'</span>':'')+'</div>'
+      +(e.note?'<div class="note">"'+esc(e.note)+'"</div>':'')+'</div>'
+      +'<div class="acts"><button data-edit="m:'+e.id+'" aria-label="Ubah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'
+      +'<button data-del="m:'+e.id+'" aria-label="Hapus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div></div>';
+  }
+}
+function fracLabel(n){ return n===1?'¼':n===2?'½':n===3?'¾':'satu'; }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+const modalRoot=document.getElementById('modal-root');
+function closeModal(){ modalRoot.innerHTML=''; }
+function openSheet(inner){
+  modalRoot.innerHTML='<div class="overlay" data-overlay><div class="sheet" role="dialog" aria-modal="true">'+inner+'</div></div>';
+}
+function sheetHead(title,sub){
+  return '<div class="sh-head"><div><h2>'+title+'</h2>'+(sub?'<div class="sh-sub">'+sub+'</div>':'')+'</div>'
+    +'<button class="closeb" data-close aria-label="Tutup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>';
+}
+
+/* ----- Form pencatatan (hafalan & murajaah & edit) ----- */
+// draft menyimpan input sementara
+let draft={};
+function recordForm(kind, existing){
+  // kind: 'hafalan' | 'murajaah' ; existing: entri untuk edit
+  const isH=kind==='hafalan';
+  draft={
+    kind, id: existing?existing.id:null,
+    date: existing?existing.date:todayStr(),
+    method:'juz', juz:1, from:1, to:1, page:1, quarters:[1,2,3,4],
+    quality: existing?existing.quality:null,
+    note: existing?(existing.note||''):'',
+    initial: existing?!!existing.initial:false
+  };
+  if(existing){
+    if(isH){
+      if(existing.items.length===1 && existing.items[0].quarters.length<4){
+        draft.method='halaman'; draft.page=existing.items[0].page; draft.quarters=[...existing.items[0].quarters];
+      } else {
+        const ps=existing.items.map(x=>x.page).sort((a,b)=>a-b);
+        draft.method='rentang'; draft.from=ps[0]; draft.to=ps[ps.length-1];
+      }
+    } else {
+      const ps=[...existing.pages].sort((a,b)=>a-b);
+      if(ps.length===1){ draft.method='halaman'; draft.page=ps[0]; }
+      else { draft.method='rentang'; draft.from=ps[0]; draft.to=ps[ps.length-1]; }
+    }
+  }
+  openSheet(recordInner());
+  bindRecord();
+}
+function recordInner(){
+  const isH=draft.kind==='hafalan';
+  const title=(draft.id?'Ubah ':'')+(isH?'Tambah Hafalan':'Catat Murajaah');
+  let h=sheetHead(title, isH?'Setiap halaman, sedikit demi sedikit.':'Ulangi dan kuatkan hafalanmu.');
+  h+='<form id="recForm">';
+  // tanggal
+  h+='<div class="field"><label for="f-date">Tanggal</label><input type="date" id="f-date" value="'+draft.date+'" max="'+todayStr()+'"></div>';
+  // metode
+  h+='<div class="field"><label>Pilih bagian</label><div class="seg" id="f-method">'
+    +'<button type="button" data-m="juz" class="'+(draft.method==='juz'?'on':'')+'">Satu Juz</button>'
+    +'<button type="button" data-m="rentang" class="'+(draft.method==='rentang'?'on':'')+'">Rentang</button>'
+    +'<button type="button" data-m="halaman" class="'+(draft.method==='halaman'?'on':'')+'">Satu Halaman</button>'
+    +'</div><div id="method-body">'+methodBody()+'</div></div>';
+  // kualitas
+  h+='<div class="field"><label>Kualitas hafalan'+(isH?'':' (opsional)')+'</label><div class="seg q" id="f-quality">'
+    +'<button type="button" data-q="lancar" class="'+(draft.quality==='lancar'?'on':'')+'">Lancar</button>'
+    +'<button type="button" data-q="penguatan" class="'+(draft.quality==='penguatan'?'on':'')+'">Perlu penguatan</button>'
+    +'<button type="button" data-q="diulang" class="'+(draft.quality==='diulang'?'on':'')+'">Perlu diulang</button>'
+    +'</div></div>';
+  // hafalan awal (khusus hafalan)
+  if(isH){
+    h+='<div class="field"><button type="button" class="toggle'+(draft.initial?' on':'')+'" id="f-initial"><span class="sw2"></span><span class="tx"><b>Tandai sebagai hafalan awal</b><span>Masuk ke total hafalan, tidak dihitung sebagai hafalan baru periode ini</span></span></button></div>';
+  }
+  // catatan
+  h+='<div class="field"><label for="f-note">Catatan (opsional)</label><textarea id="f-note" placeholder="Misal: perhatikan ayat mutasyabihat...">'+esc(draft.note)+'</textarea></div>';
+  h+='<button type="submit" class="btn primary">'+(draft.id?'Simpan perubahan':'Simpan')+'</button>';
+  h+='</form>';
+  return h;
+}
+function methodBody(){
+  const isH=draft.kind==='hafalan';
+  if(draft.method==='juz'){
+    const [a,b]=juzRange(draft.juz);
+    let opt='';
+    for(let j=1;j<=30;j++){ const [x,y]=juzRange(j); opt+='<option value="'+j+'"'+(j===draft.juz?' selected':'')+'>Juz '+j+' (hlm '+x+'–'+y+')</option>'; }
+    return '<div style="margin-top:10px"><select id="f-juz">'+opt+'</select>'
+      +'<div class="hint">Otomatis mencakup halaman '+a+'–'+b+' ('+juzPageCount(draft.juz)+' halaman) secara penuh.</div></div>';
+  }
+  if(draft.method==='rentang'){
+    return '<div class="row2" style="margin-top:10px">'
+      +'<div><label style="font-size:11.5px;color:var(--text-faint);font-weight:600">Dari halaman</label><input type="number" id="f-from" min="1" max="604" value="'+draft.from+'"></div>'
+      +'<div><label style="font-size:11.5px;color:var(--text-faint);font-weight:600">Sampai halaman</label><input type="number" id="f-to" min="1" max="604" value="'+draft.to+'"></div>'
+      +'</div><div class="hint">Halaman 1–604. Setiap halaman dicatat penuh.</div>';
+  }
+  // halaman
+  let h='<div style="margin-top:10px"><input type="number" id="f-page" min="1" max="604" value="'+draft.page+'" placeholder="Nomor halaman (1–604)">';
+  h+='<div class="hint">Juz '+pageToJuz(draft.page)+'</div>';
+  if(isH){
+    h+='<div class="qtr" id="f-preset">'
+      +'<button type="button" data-preset="1">¼ halaman</button>'
+      +'<button type="button" data-preset="2">½ halaman</button>'
+      +'<button type="button" data-preset="3">¾ halaman</button>'
+      +'<button type="button" data-preset="4">Penuh</button></div>';
+    h+='<div class="qgrid" id="f-qgrid">';
+    for(let q=1;q<=4;q++) h+='<button type="button" data-q="'+q+'" class="'+(draft.quarters.includes(q)?'on':'')+'">Bagian '+q+'</button>';
+    h+='</div><div class="hint">Pilih bagian halaman yang dihafal. Bagian yang sama tidak akan dihitung dua kali.</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function refreshMethodBody(){ const mb=document.getElementById('method-body'); if(mb) mb.innerHTML=methodBody(); bindMethodBody(); }
+function bindMethodBody(){
+  const isH=draft.kind==='hafalan';
+  const jsel=document.getElementById('f-juz'); if(jsel) jsel.onchange=()=>{ draft.juz=+jsel.value; refreshMethodBody(); };
+  const ff=document.getElementById('f-from'); if(ff) ff.oninput=()=>{ draft.from=clampPage(ff.value); };
+  const ft=document.getElementById('f-to'); if(ft) ft.oninput=()=>{ draft.to=clampPage(ft.value); };
+  const fp=document.getElementById('f-page'); if(fp) fp.oninput=()=>{ draft.page=clampPage(fp.value); const hint=fp.nextElementSibling; if(hint&&hint.classList.contains('hint')) hint.textContent='Juz '+pageToJuz(draft.page); };
+  if(isH){
+    const preset=document.getElementById('f-preset');
+    if(preset) preset.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const n=+b.dataset.preset; draft.quarters=[]; for(let i=1;i<=n;i++) draft.quarters.push(i); syncQgrid(); });
+    const grid=document.getElementById('f-qgrid');
+    if(grid) grid.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const q=+b.dataset.q; const i=draft.quarters.indexOf(q); if(i>=0)draft.quarters.splice(i,1); else draft.quarters.push(q); draft.quarters.sort(); syncQgrid(); });
+  }
+}
+function syncQgrid(){ const grid=document.getElementById('f-qgrid'); if(!grid)return; grid.querySelectorAll('button').forEach(b=>b.classList.toggle('on',draft.quarters.includes(+b.dataset.q))); }
+function clampPage(v){ v=parseInt(v,10); if(isNaN(v))v=1; return Math.min(604,Math.max(1,v)); }
+function bindRecord(){
+  const isH=draft.kind==='hafalan';
+  document.getElementById('f-date').onchange=e=>draft.date=e.target.value;
+  document.querySelectorAll('#f-method button').forEach(b=>b.onclick=()=>{ draft.method=b.dataset.m; document.querySelectorAll('#f-method button').forEach(x=>x.classList.toggle('on',x===b)); refreshMethodBody(); });
+  document.querySelectorAll('#f-quality button').forEach(b=>b.onclick=()=>{ const q=b.dataset.q; draft.quality = draft.quality===q?null:q; document.querySelectorAll('#f-quality button').forEach(x=>x.classList.toggle('on', x.dataset.q===draft.quality)); });
+  if(isH){ const ti=document.getElementById('f-initial'); if(ti) ti.onclick=()=>{ draft.initial=!draft.initial; ti.classList.toggle('on',draft.initial); }; }
+  const note=document.getElementById('f-note'); note.oninput=()=>draft.note=note.value;
+  bindMethodBody();
+  document.getElementById('recForm').onsubmit=e=>{ e.preventDefault(); submitRecord(); };
+}
+function buildItems(){
+  // untuk hafalan
+  if(draft.method==='juz'){ return juzPages(draft.juz).map(p=>({page:p,quarters:[1,2,3,4]})); }
+  if(draft.method==='rentang'){ let a=Math.min(draft.from,draft.to),b=Math.max(draft.from,draft.to); const it=[]; for(let p=a;p<=b;p++) it.push({page:p,quarters:[1,2,3,4]}); return it; }
+  return [{page:draft.page, quarters:[...draft.quarters].sort()}];
+}
+function buildPages(){
+  if(draft.method==='juz'){ return juzPages(draft.juz); }
+  if(draft.method==='rentang'){ let a=Math.min(draft.from,draft.to),b=Math.max(draft.from,draft.to); const r=[]; for(let p=a;p<=b;p++) r.push(p); return r; }
+  return [draft.page];
+}
+function submitRecord(){
+  const isH=draft.kind==='hafalan';
+  if(isH){
+    if(draft.method==='halaman' && draft.quarters.length===0){ toast('Pilih minimal satu bagian halaman'); return; }
+    const items=buildItems();
+    if(items.length===0){ toast('Pilih halaman terlebih dahulu'); return; }
+    if(draft.id){
+      const e=state.hafalan.find(x=>x.id===draft.id);
+      Object.assign(e,{date:draft.date,quality:draft.quality,note:draft.note.trim(),initial:draft.initial,items});
+    } else {
+      state.hafalan.push({id:uid(),date:draft.date,createdAt:Date.now(),initial:draft.initial,quality:draft.quality,note:draft.note.trim(),items});
+    }
+  } else {
+    const pages=buildPages();
+    if(pages.length===0){ toast('Pilih halaman terlebih dahulu'); return; }
+    if(draft.id){
+      const e=state.murajaah.find(x=>x.id===draft.id);
+      Object.assign(e,{date:draft.date,quality:draft.quality,note:draft.note.trim(),pages});
+    } else {
+      state.murajaah.push({id:uid(),date:draft.date,createdAt:Date.now(),quality:draft.quality,note:draft.note.trim(),pages});
+    }
+  }
+  save(); closeModal(); render();
+  toast(draft.id?'Catatan diperbarui':(isH?'Hafalan tercatat, barakallah':'Murajaah tercatat'));
+}
+
+/* ----- Detail halaman ----- */
+function openPage(p){
+  const D=derive(); const pd=D.pages[p]; const st=pageStatus(pd);
+  let h=sheetHead('Halaman '+p, 'Juz '+pageToJuz(p));
+  h+='<div class="info-line">Status: <b>'+st.label+'</b>'+(pd&&pd.mem>0?' · '+(pd.mem/4===1?'penuh':fracLabel(pd.mem)+' halaman'):'')+'</div>';
+  // bagian yang dihafal
+  h+='<div class="kv"><span class="k">Bagian dihafal</span><span class="v">'+(pd&&pd.mem>0?[1,2,3,4].map(q=>pd.quarters.has(q)?'●':'○').join(' '):'Belum ada')+'</span></div>';
+  h+='<div class="kv"><span class="k">Kualitas terakhir</span><span class="v">'+(pd&&pd.quality?QLABEL[pd.quality]:'—')+'</span></div>';
+  h+='<div class="kv"><span class="k">Murajaah terakhir</span><span class="v">'+(pd&&pd.lastMurajaah?shortDate(pd.lastMurajaah):'Belum pernah')+'</span></div>';
+  h+='<div class="kv"><span class="k">Dimurajaah siklus aktif</span><span class="v">'+(pd&&pd.reviewedActive?'Sudah':'Belum')+'</span></div>';
+  // riwayat singkat
+  const hist=[];
+  for(const e of state.hafalan) if(e.items.some(x=>x.page===p)) hist.push({t:'Hafalan',date:e.date,createdAt:e.createdAt,q:e.quality,initial:e.initial});
+  for(const e of state.murajaah) if(e.pages.includes(p)) hist.push({t:'Murajaah',date:e.date,createdAt:e.createdAt,q:e.quality});
+  hist.sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:b.createdAt-a.createdAt);
+  h+='<div class="section-title" style="margin:16px 0 4px">Riwayat singkat</div>';
+  if(hist.length===0) h+='<div class="empty-note">Belum ada aktivitas untuk halaman ini.</div>';
+  else{ h+='<div class="page-hist">'; for(const x of hist.slice(0,8)) h+='<div class="ph"><span>'+x.t+(x.initial?' (awal)':'')+(x.q?' · '+QLABEL[x.q]:'')+'</span><span>'+shortDate(x.date)+'</span></div>'; h+='</div>'; }
+  h+='<div class="btn-row"><button class="btn ghost" style="flex:1" data-quick-hafalan="'+p+'">Tambah hafalan</button><button class="btn ghost" style="flex:1" data-quick-murajaah="'+p+'">Catat murajaah</button></div>';
+  openSheet(h);
+}
+
+/* ----- Detail juz ----- */
+function openJuz(j){
+  const D=derive(); const jd=D.juz[j]; const [a,b]=juzRange(j);
+  let h=sheetHead('Juz '+j, 'Halaman '+a+'–'+b+' · '+jd.count+' halaman');
+  h+='<div class="info-line" style="display:flex;align-items:center;gap:14px"><div class="juz-ring" style="width:56px;height:56px">'+ring(jd.pct,56,6)+'<span class="lbl tnum">'+fmtPct(jd.pct)+'</span></div>'
+    +'<div><div style="font-weight:800;font-size:16px">'+fmtNum(jd.memPages)+' dari '+jd.count+' halaman</div><div style="color:var(--text-faint);font-size:12.5px">'+fmtPct(jd.pct)+'% hafalan juz ini</div></div></div>';
+  h+='<div class="page-grid" id="juz-pages">';
+  for(let p=a;p<=b;p++) h+=pageCell(p,D);
+  h+='</div>';
+  h+=legendHtml();
+  openSheet(h);
+}
+
+/* ----- Target ----- */
+function openTarget(){
+  const t=state.target||{mode:'harian',pages:1};
+  let h=sheetHead('Target Hafalan Baru','Tentukan ritme yang nyaman untukmu.');
+  h+='<div class="field"><label>Periode</label><div class="seg" id="t-mode">'
+    +'<button type="button" data-m="harian" class="'+(t.mode==='harian'?'on':'')+'">Harian</button>'
+    +'<button type="button" data-m="mingguan" class="'+(t.mode==='mingguan'?'on':'')+'">Mingguan</button></div></div>';
+  h+='<div class="field"><label for="t-pages">Jumlah halaman baru per periode</label>'
+    +'<input type="number" id="t-pages" min="0.25" step="0.25" value="'+t.pages+'"><div class="hint">Boleh pecahan, misal 0,5 halaman. Minggu dihitung Senin–Minggu.</div></div>';
+  h+='<button class="btn primary" id="t-save">Simpan target</button>';
+  if(state.target) h+='<div class="btn-row"><button class="btn danger" style="width:100%" id="t-clear">Hapus target</button></div>';
+  openSheet(h);
+  let mode=t.mode;
+  document.querySelectorAll('#t-mode button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m; document.querySelectorAll('#t-mode button').forEach(x=>x.classList.toggle('on',x===b)); });
+  document.getElementById('t-save').onclick=()=>{ let p=parseFloat(document.getElementById('t-pages').value.replace(',','.')); if(isNaN(p)||p<=0){toast('Masukkan jumlah halaman');return;} state.target={mode,pages:p}; save(); closeModal(); render(); toast('Target disimpan'); };
+  const clr=document.getElementById('t-clear'); if(clr) clr.onclick=()=>{ state.target=null; save(); closeModal(); render(); toast('Target dihapus'); };
+}
+
+/* ----- Siklus murajaah ----- */
+let cycleDraft=null;
+function openCycle(){
+  const D=derive();
+  const memJuz=[]; for(let j=1;j<=30;j++) if(D.juz[j].memPages>0) memJuz.push(j);
+  cycleDraft={name:'', scope:'all', juzSel:[], from:1, to:604, start:todayStr(), endDays:7};
+  const active=activeCycle();
+  let h=sheetHead('Siklus Murajaah', 'Pilih bagian hafalan yang ingin diulang.');
+  if(active){
+    const cd=D.cycle;
+    h+='<div class="info-line"><b>Siklus aktif:</b> '+esc(active.name)+'<br>'+shortDate(active.start)+' – '+shortDate(active.end)+' · '+cd.reviewed+'/'+cd.total+' halaman diulang ('+fmtPct(cd.pct)+'%)<br><span style="color:var(--text-faint)">Membuat siklus baru tidak menghapus riwayat siklus ini.</span></div>';
+  }
+  if(memJuz.length===0){
+    h+='<div class="empty-note">Kamu belum memiliki hafalan yang tercatat. Tambahkan hafalan dulu, lalu buat siklus murajaah dari bagian yang ingin diulang.</div>';
+    openSheet(h); return;
+  }
+  h+='<div class="field"><label for="c-name">Nama siklus (opsional)</label><input type="text" id="c-name" placeholder="Misal: Murajaah Juz 30 – pekan ini"></div>';
+  h+='<div class="field"><label>Cakupan halaman</label><div class="seg" id="c-scope">'
+    +'<button type="button" data-s="all" class="on">Seluruh hafalan</button>'
+    +'<button type="button" data-s="juz">Pilih juz</button>'
+    +'<button type="button" data-s="rentang">Rentang</button></div><div id="c-scope-body"></div></div>';
+  h+='<div class="row2"><div class="field"><label for="c-start">Tanggal mulai</label><input type="date" id="c-start" value="'+todayStr()+'"></div>'
+    +'<div class="field"><label for="c-end">Tanggal selesai</label><input type="date" id="c-end" value="'+addDays(todayStr(),7)+'"></div></div>';
+  h+='<div id="c-preview" class="info-line" style="display:none"></div>';
+  h+='<button class="btn primary" id="c-save">Mulai siklus murajaah</button>';
+  openSheet(h);
+  bindCycle(memJuz,D);
+}
+function addDays(s,n){ const d=parseD(s); d.setDate(d.getDate()+n); return fmtDate(d); }
+function cycleScopeBody(memJuz){
+  if(cycleDraft.scope==='all'){ return '<div class="hint" style="margin-top:8px">Seluruh halaman yang sudah kamu hafal akan dimasukkan ke target siklus.</div>'; }
+  if(cycleDraft.scope==='juz'){
+    let h='<div class="juz-picker" style="margin-top:9px">';
+    for(let j=1;j<=30;j++){ const dis=!memJuz.includes(j); h+='<button type="button" data-j="'+j+'" class="'+(cycleDraft.juzSel.includes(j)?'on':'')+'"'+(dis?' disabled':'')+'>'+j+'</button>'; }
+    h+='</div><div class="hint">Hanya juz yang sudah ada hafalannya yang bisa dipilih.</div>';
+    return h;
+  }
+  return '<div class="row2" style="margin-top:9px"><div><label style="font-size:11.5px;color:var(--text-faint);font-weight:600">Dari halaman</label><input type="number" id="c-from" min="1" max="604" value="1"></div>'
+    +'<div><label style="font-size:11.5px;color:var(--text-faint);font-weight:600">Sampai halaman</label><input type="number" id="c-to" min="1" max="604" value="604"></div></div><div class="hint">Hanya halaman yang sudah dihafal dalam rentang ini yang dimasukkan.</div>';
+}
+function computeCyclePages(D){
+  let pages=[];
+  if(cycleDraft.scope==='all'){ pages=Object.keys(D.pages).map(Number); }
+  else if(cycleDraft.scope==='juz'){ for(const j of cycleDraft.juzSel){ const [a,b]=juzRange(j); for(let p=a;p<=b;p++) if(D.pages[p]) pages.push(p); } }
+  else { let a=Math.min(cycleDraft.from,cycleDraft.to),b=Math.max(cycleDraft.from,cycleDraft.to); for(let p=a;p<=b;p++) if(D.pages[p]) pages.push(p); }
+  return [...new Set(pages)].filter(p=>D.pages[p]&&D.pages[p].mem>0).sort((a,b)=>a-b);
+}
+function updateCyclePreview(D){
+  const pv=document.getElementById('c-preview'); if(!pv)return;
+  const pages=computeCyclePages(D);
+  pv.style.display='block';
+  pv.innerHTML='Target siklus: <b>'+pages.length+' halaman</b> yang sudah dihafal akan dijadwalkan untuk diulang.';
+}
+function bindCycle(memJuz,D){
+  const nameEl=document.getElementById('c-name'); nameEl.oninput=()=>cycleDraft.name=nameEl.value;
+  const body=document.getElementById('c-scope-body'); body.innerHTML=cycleScopeBody(memJuz);
+  bindScopeBody(memJuz,D);
+  document.querySelectorAll('#c-scope button').forEach(b=>b.onclick=()=>{ cycleDraft.scope=b.dataset.s; document.querySelectorAll('#c-scope button').forEach(x=>x.classList.toggle('on',x===b)); body.innerHTML=cycleScopeBody(memJuz); bindScopeBody(memJuz,D); updateCyclePreview(D); });
+  document.getElementById('c-start').onchange=e=>cycleDraft.start=e.target.value;
+  document.getElementById('c-end').onchange=e=>cycleDraft.end=e.target.value;
+  updateCyclePreview(D);
+  document.getElementById('c-save').onclick=()=>{
+    const start=document.getElementById('c-start').value; const end=document.getElementById('c-end').value;
+    if(!start||!end){ toast('Tentukan tanggal mulai dan selesai'); return; }
+    if(end<start){ toast('Tanggal selesai harus setelah tanggal mulai'); return; }
+    const pages=computeCyclePages(D);
+    if(pages.length===0){ toast('Pilih bagian hafalan yang ingin diulang'); return; }
+    const id=uid();
+    state.cycles.push({id,name:(cycleDraft.name.trim()||'Siklus murajaah'),start,end,targetPages:pages,createdAt:Date.now()});
+    state.activeCycleId=id; save(); closeModal(); render(); toast('Siklus murajaah dimulai');
+  };
+}
+function bindScopeBody(memJuz,D){
+  if(cycleDraft.scope==='juz'){
+    document.querySelectorAll('#c-scope-body .juz-picker button').forEach(b=>{ if(b.disabled)return; b.onclick=()=>{ const j=+b.dataset.j; const i=cycleDraft.juzSel.indexOf(j); if(i>=0)cycleDraft.juzSel.splice(i,1); else cycleDraft.juzSel.push(j); b.classList.toggle('on'); updateCyclePreview(D); }; });
+  } else if(cycleDraft.scope==='rentang'){
+    const f=document.getElementById('c-from'),t=document.getElementById('c-to');
+    if(f) f.oninput=()=>{ cycleDraft.from=clampPage(f.value); updateCyclePreview(D); };
+    if(t) t.oninput=()=>{ cycleDraft.to=clampPage(t.value); updateCyclePreview(D); };
+  }
+}
+
+/* ----- Pengaturan ----- */
+function openSettings(){
+  let h=sheetHead('Pengaturan','');
+  h+='<div class="settings-group">';
+  h+=setItem('target','Target hafalan baru', state.target?((state.target.mode==='mingguan'?'Mingguan':'Harian')+' · '+fmtNum(state.target.pages)+' halaman'):'Belum diatur','svg-target');
+  h+=setItem('cycle','Siklus murajaah', activeCycle()?('Aktif · '+esc(activeCycle().name)):'Belum ada siklus aktif','svg-cycle');
+  h+=setItem('backup','Cadangan data', 'Salin atau pulihkan data','svg-backup');
+  h+=setItem('theme','Tema tampilan', 'Ikuti sistem / terang / gelap','svg-theme');
+  h+=setItem('reset','Reset semua data', 'Hapus seluruh catatan','svg-reset');
+  h+='</div>';
+  h+='<div class="info-line" style="margin-top:14px">Data tersimpan hanya di browser & perangkat ini. Jika kamu mengganti perangkat, membersihkan data browser, atau memakai mode penyamaran, catatan bisa hilang. Gunakan <b>Cadangan data</b> secara berkala untuk menyalin datamu ke tempat aman.</div>';
+  openSheet(h);
+}
+function setItem(act,title,sub,icon){
+  const icons={
+    'svg-target':'<path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+    'svg-cycle':'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/>',
+    'svg-backup':'<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+    'svg-theme':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/>',
+    'svg-reset':'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'
+  };
+  return '<button class="set-item" data-open="'+act+'"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+icons[icon]+'</svg></span><span class="tx"><b>'+title+'</b><span>'+sub+'</span></span><span class="go">›</span></button>';
+}
+
+/* ----- Cadangan ----- */
+function openBackup(){
+  let h=sheetHead('Cadangan Data','Salin data untuk disimpan, atau tempel untuk memulihkan.');
+  h+='<div class="info-line">Data hanya tersimpan di browser & perangkat ini. Salin teks di bawah dan simpan di catatan/email agar aman.</div>';
+  h+='<div class="field"><label for="b-out">Data cadangan (salin ini)</label><textarea id="b-out" readonly style="min-height:110px;font-family:ui-monospace,monospace;font-size:12px">'+esc(JSON.stringify(state))+'</textarea></div>';
+  h+='<div class="btn-row"><button class="btn ghost" style="flex:1" id="b-copy">Salin ke clipboard</button></div>';
+  h+='<div class="field" style="margin-top:18px"><label for="b-in">Pulihkan dari cadangan</label><textarea id="b-in" placeholder="Tempel data cadangan di sini..." style="min-height:90px;font-family:ui-monospace,monospace;font-size:12px"></textarea></div>';
+  h+='<button class="btn primary" id="b-restore">Pulihkan data</button>';
+  openSheet(h);
+  document.getElementById('b-copy').onclick=async()=>{ const ta=document.getElementById('b-out'); try{ await navigator.clipboard.writeText(ta.value); toast('Data disalin'); }catch(e){ ta.select(); try{document.execCommand('copy'); toast('Data disalin');}catch(_){ toast('Salin manual dari kotak'); } } };
+  document.getElementById('b-restore').onclick=()=>{
+    const v=document.getElementById('b-in').value.trim(); if(!v){ toast('Tempel data dulu'); return; }
+    try{ const p=JSON.parse(v); if(!p||typeof p!=='object'||!Array.isArray(p.hafalan)) throw 0;
+      if(!confirm('Pulihkan data ini? Data saat ini akan diganti.')) return;
+      state=Object.assign({version:1,hafalan:[],murajaah:[],target:null,cycles:[],activeCycleId:null,onboardingDismissed:true},p);
+      save(); closeModal(); render(); toast('Data dipulihkan');
+    }catch(e){ toast('Format data tidak valid'); }
+  };
+}
+
+/* ----- Tema ----- */
+function openTheme(){
+  const cur=localStorage.getItem('theme')||'system';
+  let h=sheetHead('Tema Tampilan','');
+  h+='<div class="seg" id="th" style="flex-direction:column;gap:8px">';
+  [['system','Ikuti sistem'],['light','Terang'],['dark','Gelap']].forEach(([k,l])=>{ h+='<button type="button" data-t="'+k+'" class="'+(cur===k?'on':'')+'" style="padding:14px">'+l+'</button>'; });
+  h+='</div>';
+  openSheet(h);
+  document.querySelectorAll('#th button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; applyTheme(t); document.querySelectorAll('#th button').forEach(x=>x.classList.toggle('on',x===b)); toast('Tema diubah'); });
+}
+function applyTheme(t){ try{localStorage.setItem('theme',t);}catch(e){} if(t==='system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
+
+/* ----- Reset ----- */
+function openReset(){
+  let h=sheetHead('Reset Semua Data','Tindakan ini tidak bisa dibatalkan.');
+  h+='<div class="info-line">Seluruh catatan hafalan, murajaah, target, dan siklus akan dihapus dari perangkat ini. Pastikan kamu sudah menyalin cadangan bila perlu.</div>';
+  h+='<button class="btn danger" style="width:100%" id="r-yes">Ya, hapus semua data</button>';
+  h+='<div class="btn-row"><button class="btn ghost" style="width:100%" data-close>Batal</button></div>';
+  openSheet(h);
+  document.getElementById('r-yes').onclick=()=>{ if(!confirm('Hapus semua data secara permanen?'))return; state={version:1,hafalan:[],murajaah:[],target:null,cycles:[],activeCycleId:null,onboardingDismissed:false}; save(); closeModal(); nav('beranda'); toast('Semua data dihapus'); };
+}
+
+/* ============================================================
+   Event handling
+   ============================================================ */
+function openByName(name,arg){
+  closeModal();
+  if(name==='hafalan') recordForm('hafalan');
+  else if(name==='murajaah') recordForm('murajaah');
+  else if(name==='hafalan-awal'){ recordForm('hafalan'); draft.initial=true; const ti=document.getElementById('f-initial'); if(ti) ti.classList.add('on'); }
+  else if(name==='target') openTarget();
+  else if(name==='cycle') openCycle();
+  else if(name==='settings') openSettings();
+  else if(name==='backup') openBackup();
+  else if(name==='theme') openTheme();
+  else if(name==='reset') openReset();
+}
+document.addEventListener('click',e=>{
+  const nav1=e.target.closest('[data-nav]'); if(nav1 && nav1.dataset.nav!=='peta2'){ closeFab(); nav(nav1.dataset.nav); return; }
+  const openEl=e.target.closest('[data-open]'); if(openEl){ openByName(openEl.dataset.open); return; }
+  if(e.target.closest('[data-close]')){ closeModal(); return; }
+  if(e.target.closest('[data-overlay]') && e.target.classList.contains('overlay')){ closeModal(); return; }
+  const juzEl=e.target.closest('[data-juz]'); if(juzEl){ openJuz(+juzEl.dataset.juz); return; }
+  const pageEl=e.target.closest('[data-page]'); if(pageEl){ openPage(+pageEl.dataset.page); return; }
+  const fEl=e.target.closest('[data-filter]'); if(fEl){ petaFilter = fEl.dataset.filter==='__none'?null:fEl.dataset.filter; render(); return; }
+  const hf=e.target.closest('[data-hfilter]'); if(hf){ histFilter=hf.dataset.hfilter; render(); return; }
+  const ed=e.target.closest('[data-edit]'); if(ed){ const [t,id]=ed.dataset.edit.split(':'); const e2=(t==='h'?state.hafalan:state.murajaah).find(x=>x.id===id); if(e2) recordForm(t==='h'?'hafalan':'murajaah',e2); return; }
+  const dl=e.target.closest('[data-del]'); if(dl){ const [t,id]=dl.dataset.del.split(':'); if(confirm('Hapus catatan ini?')){ if(t==='h') state.hafalan=state.hafalan.filter(x=>x.id!==id); else state.murajaah=state.murajaah.filter(x=>x.id!==id); save(); render(); toast('Catatan dihapus'); } return; }
+  const qh=e.target.closest('[data-quick-hafalan]'); if(qh){ closeModal(); recordForm('hafalan'); draft.method='halaman'; draft.page=+qh.dataset.quickHafalan; draft.quarters=[1,2,3,4]; document.querySelectorAll('#f-method button').forEach(x=>x.classList.toggle('on',x.dataset.m==='halaman')); refreshMethodBody(); return; }
+  const qm=e.target.closest('[data-quick-murajaah]'); if(qm){ closeModal(); recordForm('murajaah'); draft.method='halaman'; draft.page=+qm.dataset.quickMurajaah; document.querySelectorAll('#f-method button').forEach(x=>x.classList.toggle('on',x.dataset.m==='halaman')); refreshMethodBody(); return; }
+  if(e.target.closest('[data-act=dismiss-onboard]')){ state.onboardingDismissed=true; save(); render(); return; }
+});
+
+/* FAB */
+let fabOpen=false;
+function closeFab(){ fabOpen=false; document.getElementById('fab').classList.remove('open'); const m=document.getElementById('fab-menu'); if(m)m.remove(); const s=document.getElementById('fab-scrim'); if(s)s.remove(); }
+document.getElementById('fab').addEventListener('click',()=>{
+  if(fabOpen){ closeFab(); return; }
+  fabOpen=true; document.getElementById('fab').classList.add('open');
+  const scrim=document.createElement('div'); scrim.className='scrim'; scrim.id='fab-scrim'; scrim.onclick=closeFab; document.body.appendChild(scrim);
+  const menu=document.createElement('div'); menu.className='fab-menu'; menu.id='fab-menu';
+  menu.innerHTML='<button class="hafalan" data-fab="hafalan"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Tambah Hafalan</button>'
+    +'<button class="murajaah" data-fab="murajaah"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg></span>Catat Murajaah</button>';
+  document.body.appendChild(menu);
+  menu.querySelectorAll('[data-fab]').forEach(b=>b.onclick=()=>{ const k=b.dataset.fab; closeFab(); openByName(k); });
+});
+
+/* Init */
+(function init(){
+  const t=localStorage.getItem('theme'); if(t&&t!=='system') document.documentElement.setAttribute('data-theme',t);
+  load();
+  render();
+})();
+</script>

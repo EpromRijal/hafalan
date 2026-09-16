@@ -1,3 +1,18 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<style>
+  :root{
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body{ margin:0; }
+  img{ max-width:100%; }
+  [hidden]{ display:none !important; }
+</style>
 <title>Jejak Hafalan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -411,6 +426,9 @@
   .page-hist{font-size:12.5px;color:var(--text-muted)}
   .page-hist .ph{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--border)}
 </style>
+</head>
+<body>
+
 
 <div class="app" id="app"></div>
 <nav class="tabs">
@@ -1297,3 +1315,6 @@ document.getElementById('fab').addEventListener('click',()=>{
   render();
 })();
 </script>
+
+</body>
+</html>

@@ -501,6 +501,7 @@ function load(){
   initScalars();
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function emptyState(){ return {version:1,hafalan:[],murajaah:[],target:null,cycles:[],activeCycleId:null,onboardingDismissed:false,tomb:{},resetAt:0,sAt:{}}; }
 
 /* ===== Penggabungan data (dipakai identik di server & browser) ===== */
 function mergeStates(a,b){
@@ -549,7 +550,7 @@ function mergeStates(a,b){
 }
 
 /* ---------- Sinkronisasi online ---------- */
-const TOKEN_KEY='jejak_sync_token', PRE_KEY='jejak_pre_sync_backup', LAST_KEY='jejak_sync_last';
+const TOKEN_KEY='jejak_sync_token', LAST_KEY='jejak_sync_last';
 const sync={status:'off',claimed:null,available:null,busy:false,again:false,timer:null,last:0};
 try{ sync.last=+localStorage.getItem(LAST_KEY)||0; }catch(e){}
 let saveSeq=0;
@@ -585,7 +586,6 @@ async function runSync(){
   sync.busy=true; sync.status='syncing'; refreshSyncRow();
   const seq=saveSeq;
   try{
-    try{ if(!localStorage.getItem(PRE_KEY) && (state.hafalan.length||state.murajaah.length)) localStorage.setItem(PRE_KEY,JSON.stringify(state)); }catch(e){}
     const res=await api('PUT',{state:state},tok);
     if(res.status===401){ setToken(''); sync.status='auth'; sync.claimed=true; if(!modalRoot.innerHTML) openSync(); return; }
     if(res.status!==200||!res.data.state) throw new Error('bad');
@@ -601,7 +601,7 @@ async function runSync(){
   }
 }
 function syncSub(){
-  if(!getToken()) return sync.available===false?'Belum tersedia di alamat ini':'Belum aktif · ketuk untuk mengaktifkan';
+  if(!getToken()) return sync.available===false?'Belum tersedia di alamat ini':'Belum masuk · ketuk untuk masuk';
   if(sync.status==='syncing') return 'Menyinkronkan…';
   if(sync.status==='offline') return 'Offline · akan dicoba lagi otomatis';
   if(sync.status==='ok'||sync.last){ const m=Math.round((Date.now()-sync.last)/60000); return 'Aktif · '+(sync.last?(m<1?'baru saja tersinkron':'tersinkron '+m+' menit lalu'):'tersambung'); }
@@ -612,17 +612,26 @@ function refreshSyncRow(){
   const st=document.getElementById('s-status'); if(st) st.textContent=syncSub();
 }
 function countRecords(){ return state.hafalan.length+state.murajaah.length; }
+async function doLogout(){
+  if(!confirm('Keluar dari perangkat ini? Datamu tetap aman online dan muncul lagi saat kamu masuk.')) return;
+  await runSync();
+  if(sync.status!=='ok' && !confirm('Perubahan terakhir belum bisa tersinkron dan akan hilang bila keluar sekarang. Tetap keluar?')) return;
+  setToken('');
+  try{ localStorage.removeItem(KEY); localStorage.removeItem(LAST_KEY); }catch(e){}
+  state=emptyState(); initScalars(); sync.status='off'; sync.claimed=true; sync.last=0;
+  closeModal(); render(); openSync();
+}
+function gated(){ return !getToken() && sync.available!==false; }
 async function openSync(){
   if(getToken()){
     let h=sheetHead('Sinkronisasi Online','');
-    h+='<div class="info-line">Datamu tersimpan online dan otomatis sama di semua perangkat yang sudah masuk dengan kata sandi yang sama.</div>';
+    h+='<div class="info-line">Datamu tersimpan online dan otomatis sama di semua perangkat yang sudah masuk dengan kata sandimu. Saat offline, catatan tetap bisa dibuat dan tersinkron begitu internet kembali.</div>';
     h+='<div class="field"><label>Status</label><div id="s-status" style="font-size:14px;font-weight:600">'+esc(syncSub())+'</div></div>';
     h+='<button class="btn primary" id="s-now">Sinkronkan sekarang</button>';
-    h+='<div class="btn-row"><button class="btn danger" style="width:100%" id="s-out">Keluar di perangkat ini</button></div>';
-    h+='<div class="hint" style="font-size:11.5px;color:var(--text-faint);margin-top:10px;line-height:1.5">Keluar hanya memutus perangkat ini. Data di perangkat dan di server tetap ada.</div>';
+    h+='<div class="btn-row"><button class="btn danger" style="width:100%" id="s-out">Keluar dari perangkat ini</button></div>';
     openSheet(h);
     document.getElementById('s-now').onclick=()=>{ runSync(); };
-    document.getElementById('s-out').onclick=()=>{ if(!confirm('Keluar dari sinkronisasi di perangkat ini?')) return; setToken(''); sync.status='off'; closeModal(); refreshSyncRow(); toast('Sinkronisasi dimatikan di perangkat ini'); };
+    document.getElementById('s-out').onclick=()=>{ doLogout(); };
     return;
   }
   if(sync.claimed===null){
@@ -631,16 +640,17 @@ async function openSync(){
     catch(e){ sync.available=false; openSheet(sheetHead('Sinkronisasi Online','')+'<div class="info-line">Layanan sinkronisasi belum tersedia di alamat ini. Buka aplikasi lewat hafalan.epromn8n.click.</div><div class="btn-row"><button class="btn ghost" style="width:100%" data-close>Tutup</button></div>'); refreshSyncRow(); return; }
   }
   const claim=!sync.claimed;
-  let h=sheetHead(claim?'Aktifkan Sinkronisasi':'Masuk Sinkronisasi',claim?'Satu kali saja, lalu data sama di semua perangkat.':'Masukkan kata sandi yang kamu buat sebelumnya.');
+  let h=sheetHead(claim?'Buat Kata Sandi':'Masuk',claim?'Satu kali saja. Datamu tersimpan online dan sama di semua perangkat.':'Masukkan kata sandimu untuk membuka datamu.');
   if(claim){
     const n=countRecords();
-    h+='<div class="info-line">Buat kata sandi untuk mengamankan datamu'+(n?'. '+n+' catatan di perangkat ini akan ikut diunggah':'')+'. Di perangkat lain, cukup masukkan kata sandi yang sama. <b>Catat kata sandinya</b>, karena tidak bisa dilihat lagi.</div>';
+    h+='<div class="info-line">Buat kata sandi untuk mengamankan datamu'+(n?'. '+n+' catatan di perangkat ini akan ikut diunggah':'')+'. Di perangkat lain, cukup masukkan kata sandi yang sama. <b>Catat kata sandinya</b>, karena tidak bisa dilihat atau dipulihkan lagi.</div>';
   }
   h+='<div class="field"><label for="s-p1">Kata sandi'+(claim?' (minimal 8 karakter)':'')+'</label><input type="password" id="s-p1" autocomplete="'+(claim?'new-password':'current-password')+'"></div>';
   if(claim) h+='<div class="field"><label for="s-p2">Ulangi kata sandi</label><input type="password" id="s-p2" autocomplete="new-password"></div>';
-  h+='<button class="btn primary" id="s-go">'+(claim?'Buat & aktifkan':'Masuk & sinkronkan')+'</button>';
-  h+='<div class="btn-row"><button class="btn ghost" style="width:100%" data-close>Nanti saja</button></div>';
+  h+='<button class="btn primary" id="s-go">'+(claim?'Buat & mulai':'Masuk')+'</button>';
   openSheet(h);
+  const cb=modalRoot.querySelector('.closeb'); if(cb) cb.remove();
+  modalRoot.firstChild.setAttribute('data-gate','1');
   const go=document.getElementById('s-go');
   go.onclick=async()=>{
     const p1=document.getElementById('s-p1').value;
@@ -649,18 +659,19 @@ async function openSync(){
     go.disabled=true; go.textContent='Memproses…';
     try{
       const r=await api('POST',{action:claim?'claim':'login',pass:p1});
-      if(r.status===200&&r.data.token){ setToken(r.data.token); sync.claimed=true; closeModal(); toast('Tersambung, menyinkronkan…'); await runSync(); if(sync.status==='ok') toast('Tersinkron'); return; }
+      if(r.status===200&&r.data.token){ setToken(r.data.token); sync.claimed=true; closeModal(); render(); toast('Menyinkronkan…'); await runSync(); render(); if(sync.status==='ok') toast('Tersinkron'); return; }
       if(r.status===409){ sync.claimed=!claim; toast(r.data.error||'Silakan coba lagi'); openSync(); return; }
-      toast(r.data.error||'Gagal'); go.disabled=false; go.textContent=claim?'Buat & aktifkan':'Masuk & sinkronkan';
-    }catch(e){ toast('Tidak bisa terhubung ke server'); go.disabled=false; go.textContent=claim?'Buat & aktifkan':'Masuk & sinkronkan'; }
+      toast(r.data.error||'Gagal'); go.disabled=false; go.textContent=claim?'Buat & mulai':'Masuk';
+    }catch(e){ toast('Tidak bisa terhubung ke server'); go.disabled=false; go.textContent=claim?'Buat & mulai':'Masuk'; }
   };
 }
 async function bootSync(){
   if(getToken()){ runSync(); return; }
   try{
     const r=await api('GET');
-    if(r.status===200&&typeof r.data.claimed==='boolean'){ sync.claimed=r.data.claimed; sync.available=true; refreshSyncRow(); if(!modalRoot.innerHTML) openSync(); }
-  }catch(e){ sync.available=false; }
+    if(r.status===200&&typeof r.data.claimed==='boolean'){ sync.claimed=r.data.claimed; sync.available=true; refreshSyncRow(); render(); if(!modalRoot.innerHTML) openSync(); }
+    else { sync.available=false; render(); }
+  }catch(e){ sync.available=false; render(); }
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && getToken()) runSync(); });
 window.addEventListener('online',()=>{ if(getToken()) runSync(); });
@@ -825,7 +836,7 @@ function render(){
   if(view==='beranda') html+=renderBeranda(D);
   else if(view==='peta') html+=renderPeta(D);
   else if(view==='riwayat') html+=renderRiwayat(D);
-  app.innerHTML=html;
+  app.innerHTML=gated()?'':html;
 }
 
 /* ---------- Beranda ---------- */
@@ -1074,7 +1085,7 @@ function fracLabel(n){ return n===1?'¼':n===2?'½':n===3?'¾':'satu'; }
    MODALS
    ============================================================ */
 const modalRoot=document.getElementById('modal-root');
-function closeModal(){ modalRoot.innerHTML=''; }
+function closeModal(){ if(gated() && modalRoot.querySelector('[data-gate]')) return; modalRoot.innerHTML=''; }
 function openSheet(inner){
   modalRoot.innerHTML='<div class="overlay" data-overlay><div class="sheet" role="dialog" aria-modal="true">'+inner+'</div></div>';
 }
@@ -1378,12 +1389,11 @@ function openSettings(){
   h+='<div class="settings-group">';
   h+=setItem('target','Target hafalan baru', state.target?((state.target.mode==='mingguan'?'Mingguan':'Harian')+' · '+fmtNum(state.target.pages)+' halaman'):'Belum diatur','svg-target');
   h+=setItem('cycle','Siklus murajaah', activeCycle()?('Aktif · '+esc(activeCycle().name)):'Belum ada siklus aktif','svg-cycle');
-  h+=setItem('sync','Sinkronisasi online', syncSub(),'svg-sync');
-  h+=setItem('backup','Cadangan data', 'Salin atau pulihkan data','svg-backup');
+  h+=setItem('sync','Sinkronisasi & akun', syncSub(),'svg-sync');
   h+=setItem('theme','Tema tampilan', 'Ikuti sistem / terang / gelap','svg-theme');
   h+=setItem('reset','Reset semua data', 'Hapus seluruh catatan','svg-reset');
   h+='</div>';
-  h+='<div class="info-line" style="margin-top:14px">Data selalu tersimpan di browser perangkat ini. Aktifkan <b>Sinkronisasi online</b> agar datamu sama di semua perangkat dan aman bila browser dibersihkan. Tetap gunakan <b>Cadangan data</b> sesekali untuk menyalin datamu ke tempat aman.</div>';
+  h+='<div class="info-line" style="margin-top:14px">Datamu tersimpan online dan otomatis sama di semua perangkat yang sudah masuk. Catatan tetap bisa dibuat saat offline dan tersinkron begitu internet kembali.</div>';
   openSheet(h);
 }
 function setItem(act,title,sub,icon){
@@ -1391,34 +1401,10 @@ function setItem(act,title,sub,icon){
     'svg-target':'<path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
     'svg-cycle':'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/>',
     'svg-sync':'<path d="M7 18a4 4 0 0 1-.6-7.96A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9H7Z"/>',
-    'svg-backup':'<path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
     'svg-theme':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/>',
     'svg-reset':'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'
   };
   return '<button class="set-item" data-open="'+act+'"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+icons[icon]+'</svg></span><span class="tx"><b>'+title+'</b><span>'+sub+'</span></span><span class="go">›</span></button>';
-}
-
-/* ----- Cadangan ----- */
-function openBackup(){
-  let h=sheetHead('Cadangan Data','Salin data untuk disimpan, atau tempel untuk memulihkan.');
-  h+='<div class="info-line">Salin teks di bawah dan simpan di catatan/email sebagai cadangan tambahan, meski sinkronisasi online aktif.</div>';
-  h+='<div class="field"><label for="b-out">Data cadangan (salin ini)</label><textarea id="b-out" readonly style="min-height:110px;font-family:ui-monospace,monospace;font-size:12px">'+esc(JSON.stringify(state))+'</textarea></div>';
-  h+='<div class="btn-row"><button class="btn ghost" style="flex:1" id="b-copy">Salin ke clipboard</button></div>';
-  h+='<div class="field" style="margin-top:18px"><label for="b-in">Pulihkan dari cadangan</label><textarea id="b-in" placeholder="Tempel data cadangan di sini..." style="min-height:90px;font-family:ui-monospace,monospace;font-size:12px"></textarea></div>';
-  h+='<button class="btn primary" id="b-restore">Pulihkan data</button>';
-  openSheet(h);
-  document.getElementById('b-copy').onclick=async()=>{ const ta=document.getElementById('b-out'); try{ await navigator.clipboard.writeText(ta.value); toast('Data disalin'); }catch(e){ ta.select(); try{document.execCommand('copy'); toast('Data disalin');}catch(_){ toast('Salin manual dari kotak'); } } };
-  document.getElementById('b-restore').onclick=()=>{
-    const v=document.getElementById('b-in').value.trim(); if(!v){ toast('Tempel data dulu'); return; }
-    try{ const p=JSON.parse(v); if(!p||typeof p!=='object'||!Array.isArray(p.hafalan)) throw 0;
-      if(!confirm('Pulihkan data ini? Data saat ini akan diganti'+(getToken()?' (termasuk data online di semua perangkat).':'.'))) return;
-      state=Object.assign({version:1,hafalan:[],murajaah:[],target:null,cycles:[],activeCycleId:null,onboardingDismissed:true},p);
-      const now=Date.now(); state.tomb={}; state.resetAt=now; state.sAt={target:now,activeCycleId:now,onboardingDismissed:now};
-      ['hafalan','murajaah','cycles'].forEach(c=>{ state[c]=(Array.isArray(state[c])?state[c]:[]).map(x=>Object.assign({},x,{updatedAt:now})); });
-      initScalars();
-      save(); closeModal(); render(); toast('Data dipulihkan');
-    }catch(e){ toast('Format data tidak valid'); }
-  };
 }
 
 /* ----- Tema ----- */
@@ -1436,11 +1422,11 @@ function applyTheme(t){ try{localStorage.setItem('theme',t);}catch(e){} if(t==='
 /* ----- Reset ----- */
 function openReset(){
   let h=sheetHead('Reset Semua Data','Tindakan ini tidak bisa dibatalkan.');
-  h+='<div class="info-line">Seluruh catatan hafalan, murajaah, target, dan siklus akan dihapus dari perangkat ini. Bila sinkronisasi online aktif, data online dan perangkat lain ikut terhapus. Pastikan kamu sudah menyalin cadangan bila perlu.</div>';
+  h+='<div class="info-line">Seluruh catatan hafalan, murajaah, target, dan siklus akan dihapus, baik di perangkat ini maupun online dan di semua perangkat lain. Ini tidak bisa dikembalikan.</div>';
   h+='<button class="btn danger" style="width:100%" id="r-yes">Ya, hapus semua data</button>';
   h+='<div class="btn-row"><button class="btn ghost" style="width:100%" data-close>Batal</button></div>';
   openSheet(h);
-  document.getElementById('r-yes').onclick=()=>{ if(!confirm('Hapus semua data secara permanen?'))return; const now=Date.now(); state={version:1,hafalan:[],murajaah:[],target:null,cycles:[],activeCycleId:null,onboardingDismissed:false,tomb:{},resetAt:now,sAt:{target:now,activeCycleId:now,onboardingDismissed:now}}; initScalars(); save(); closeModal(); nav('beranda'); toast('Semua data dihapus'); };
+  document.getElementById('r-yes').onclick=()=>{ if(!confirm('Hapus semua data secara permanen?'))return; const now=Date.now(); state=emptyState(); state.resetAt=now; state.sAt={target:now,activeCycleId:now,onboardingDismissed:now}; initScalars(); save(); closeModal(); nav('beranda'); toast('Semua data dihapus'); };
 }
 
 /* ============================================================
@@ -1455,7 +1441,6 @@ function openByName(name,arg){
   else if(name==='cycle') openCycle();
   else if(name==='settings') openSettings();
   else if(name==='sync') openSync();
-  else if(name==='backup') openBackup();
   else if(name==='theme') openTheme();
   else if(name==='reset') openReset();
 }
